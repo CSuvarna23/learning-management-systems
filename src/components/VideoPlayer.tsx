@@ -33,7 +33,7 @@ export function VideoPlayer({
   onNavigate,
 }: VideoPlayerProps) {
   const intervalRef = useRef<number>();
-  const playerRef = useRef<YT.Player | null>(null);
+  const playerRef = useRef<YTPlayer | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const hasCompletedRef = useRef(false);
 
