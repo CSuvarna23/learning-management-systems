@@ -2,8 +2,12 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
-import { BookOpen, ArrowRight, LogOut, Sparkles, GraduationCap, TrendingUp } from "lucide-react";
+import { BookOpen, ArrowRight, LogOut, Search, Star, Users, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import courseWebDev from "@/assets/course-web-dev.jpg";
+import courseReact from "@/assets/course-react.jpg";
+import courseDatabase from "@/assets/course-database.jpg";
 
 interface Subject {
   id: string;
@@ -12,17 +16,26 @@ interface Subject {
   description: string | null;
 }
 
-const CARD_GRADIENTS = ["subject-card-1", "subject-card-2", "subject-card-3"];
-const CARD_ICONS = [
-  <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center"><BookOpen className="h-5 w-5 text-primary" /></div>,
-  <div className="h-10 w-10 rounded-lg bg-accent/10 flex items-center justify-center"><GraduationCap className="h-5 w-5 text-accent" /></div>,
-  <div className="h-10 w-10 rounded-lg bg-coral/10 flex items-center justify-center"><TrendingUp className="h-5 w-5 text-coral" /></div>,
-];
+const COURSE_IMAGES: Record<string, string> = {
+  "intro-web-dev": courseWebDev,
+  "react-fundamentals": courseReact,
+  "database-design": courseDatabase,
+};
+
+const COURSE_BADGES: Record<string, { category: string; level: string }> = {
+  "intro-web-dev": { category: "Web Development", level: "Beginner" },
+  "react-fundamentals": { category: "Frontend", level: "Intermediate" },
+  "database-design": { category: "Backend", level: "Beginner" },
+};
+
+const CATEGORIES = ["All", "Web Development", "Frontend", "Backend", "Data Science", "Design"];
 
 export default function Index() {
   const { user, signOut } = useAuth();
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
+  const [activeCategory, setActiveCategory] = useState("All");
 
   useEffect(() => {
     supabase
@@ -36,17 +49,27 @@ export default function Index() {
       });
   }, []);
 
+  const filtered = subjects.filter(s => {
+    const matchesSearch = !search || s.title.toLowerCase().includes(search.toLowerCase());
+    const matchesCategory = activeCategory === "All" || COURSE_BADGES[s.slug]?.category === activeCategory;
+    return matchesSearch && matchesCategory;
+  });
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="border-b bg-card/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="container flex h-16 items-center justify-between">
           <Link to="/" className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded-lg gradient-hero flex items-center justify-center">
-              <BookOpen className="h-4 w-4 text-primary-foreground" />
+            <div className="h-8 w-8 rounded-lg bg-amber flex items-center justify-center">
+              <BookOpen className="h-4 w-4 text-amber-foreground" />
             </div>
-            <span className="text-lg font-display text-foreground">LearnHub</span>
+            <span className="text-lg font-display text-foreground">LearnFromScratch</span>
           </Link>
+          <nav className="hidden md:flex items-center gap-6">
+            <Link to="/" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Home</Link>
+            <Link to="/" className="text-sm font-medium text-foreground border-b-2 border-primary pb-0.5">Courses</Link>
+          </nav>
           <div className="flex items-center gap-3">
             {user ? (
               <>
@@ -58,10 +81,10 @@ export default function Index() {
             ) : (
               <>
                 <Link to="/login">
-                  <Button variant="ghost" size="sm">Sign in</Button>
+                  <Button variant="ghost" size="sm">Sign In</Button>
                 </Link>
                 <Link to="/register">
-                  <Button size="sm">Get started</Button>
+                  <Button size="sm" className="bg-amber text-amber-foreground hover:bg-amber/90">Get Started</Button>
                 </Link>
               </>
             )}
@@ -70,94 +93,113 @@ export default function Index() {
       </header>
 
       {/* Hero */}
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0 gradient-hero opacity-[0.03]" />
-        <div className="absolute top-20 right-20 h-72 w-72 rounded-full bg-primary/5 blur-3xl" />
-        <div className="absolute bottom-10 left-10 h-48 w-48 rounded-full bg-accent/5 blur-3xl" />
-        <div className="container relative py-16 md:py-24">
-          <div className="max-w-2xl animate-fade-in">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6">
-              <Sparkles className="h-3.5 w-3.5" />
-              Start your learning journey
-            </div>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-display text-foreground leading-tight text-balance">
-              Learn at your<br />
-              <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-sky">own pace</span>
-            </h1>
-            <p className="mt-5 text-lg text-muted-foreground max-w-lg leading-relaxed">
-              Structured courses with video lessons. Track your progress and pick up right where you left off.
-            </p>
-            {!user && (
-              <div className="flex items-center gap-4 mt-8">
-                <Link to="/register">
-                  <Button size="lg" className="shadow-lg shadow-primary/25">
-                    Start learning <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
-                </Link>
-                <Link to="/login">
-                  <Button variant="outline" size="lg">Sign in</Button>
-                </Link>
-              </div>
-            )}
+      <section className="gradient-hero py-16 md:py-20">
+        <div className="container text-center">
+          <h1 className="text-3xl md:text-5xl font-display text-primary-foreground mb-4">
+            Explore Our Courses
+          </h1>
+          <p className="text-primary-foreground/80 text-lg mb-8 max-w-lg mx-auto">
+            Discover courses taught by industry experts. Learn at your own pace.
+          </p>
+          <div className="max-w-xl mx-auto relative">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+            <Input
+              className="pl-12 h-12 rounded-xl bg-card border-0 shadow-lg text-base"
+              placeholder="Search courses..."
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+            />
           </div>
         </div>
       </section>
 
-      {/* Stats bar */}
-      <section className="container">
-        <div className="grid grid-cols-3 gap-4 rounded-xl border bg-card p-6 -mt-2 mb-12 shadow-sm">
-          <div className="text-center">
-            <p className="text-2xl font-display text-primary">{subjects.length}</p>
-            <p className="text-xs text-muted-foreground mt-0.5">Subjects</p>
-          </div>
-          <div className="text-center border-x">
-            <p className="text-2xl font-display text-accent">∞</p>
-            <p className="text-xs text-muted-foreground mt-0.5">Access</p>
-          </div>
-          <div className="text-center">
-            <p className="text-2xl font-display text-coral">Free</p>
-            <p className="text-xs text-muted-foreground mt-0.5">Always</p>
-          </div>
+      {/* Category filters */}
+      <section className="container py-6">
+        <div className="flex flex-wrap gap-2">
+          {CATEGORIES.map(cat => (
+            <button
+              key={cat}
+              onClick={() => setActiveCategory(cat)}
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                activeCategory === cat
+                  ? "bg-amber text-amber-foreground"
+                  : "bg-card border text-muted-foreground hover:text-foreground hover:border-foreground/20"
+              }`}
+            >
+              {cat}
+            </button>
+          ))}
         </div>
       </section>
 
       {/* Subjects */}
       <section className="container pb-20">
-        <h2 className="text-2xl font-display text-foreground mb-8">Available Subjects</h2>
         {loading ? (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {[1, 2, 3].map(i => (
-              <div key={i} className="h-52 rounded-xl bg-muted animate-pulse" />
+              <div key={i} className="h-80 rounded-xl bg-muted animate-pulse" />
             ))}
           </div>
-        ) : subjects.length === 0 ? (
+        ) : filtered.length === 0 ? (
           <div className="rounded-xl border border-dashed p-16 text-center">
             <div className="h-14 w-14 rounded-xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
               <BookOpen className="h-7 w-7 text-primary" />
             </div>
-            <p className="text-muted-foreground">No subjects available yet. Check back soon!</p>
+            <p className="text-muted-foreground">No courses found. Try a different search or category.</p>
           </div>
         ) : (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {subjects.map((subject, i) => (
-              <Link
-                key={subject.id}
-                to={user ? `/subjects/${subject.id}` : "/login"}
-                className={`group block rounded-xl border p-6 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 animate-fade-in ${CARD_GRADIENTS[i % 3]}`}
-                style={{ animationDelay: `${i * 100}ms`, opacity: 0 }}
-              >
-                {CARD_ICONS[i % 3]}
-                <h3 className="mt-4 text-xl font-display text-card-foreground group-hover:text-primary transition-colors">
-                  {subject.title}
-                </h3>
-                {subject.description && (
-                  <p className="mt-2 text-sm text-muted-foreground line-clamp-3">{subject.description}</p>
-                )}
-                <div className="mt-5 flex items-center text-sm font-medium text-primary opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:translate-x-1">
-                  Start learning <ArrowRight className="ml-1 h-3.5 w-3.5" />
-                </div>
-              </Link>
-            ))}
+            {filtered.map((subject, i) => {
+              const badge = COURSE_BADGES[subject.slug] || { category: "General", level: "Beginner" };
+              const image = COURSE_IMAGES[subject.slug];
+              return (
+                <Link
+                  key={subject.id}
+                  to={user ? `/subjects/${subject.id}` : "/login"}
+                  className="group block rounded-xl border bg-card overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 animate-fade-in"
+                  style={{ animationDelay: `${i * 100}ms`, opacity: 0 }}
+                >
+                  {/* Image */}
+                  <div className="relative h-48 overflow-hidden bg-muted">
+                    {image ? (
+                      <img src={image} alt={subject.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" width={768} height={512} />
+                    ) : (
+                      <div className="w-full h-full gradient-hero flex items-center justify-center">
+                        <BookOpen className="h-12 w-12 text-primary-foreground/50" />
+                      </div>
+                    )}
+                    {/* Badges */}
+                    <div className="absolute top-3 left-3">
+                      <span className="px-2.5 py-1 rounded-md bg-card/90 backdrop-blur-sm text-xs font-medium text-foreground">
+                        {badge.category}
+                      </span>
+                    </div>
+                    <div className="absolute top-3 right-3">
+                      <span className="px-2.5 py-1 rounded-md bg-amber text-amber-foreground text-xs font-medium">
+                        {badge.level}
+                      </span>
+                    </div>
+                  </div>
+                  {/* Content */}
+                  <div className="p-5">
+                    <h3 className="text-lg font-display text-card-foreground group-hover:text-primary transition-colors line-clamp-2">
+                      {subject.title}
+                    </h3>
+                    {subject.description && (
+                      <p className="mt-2 text-sm text-muted-foreground line-clamp-2">{subject.description}</p>
+                    )}
+                    <div className="mt-4 flex items-center gap-4 text-xs text-muted-foreground">
+                      <span className="flex items-center gap-1"><Star className="h-3.5 w-3.5 text-amber fill-amber" /> 4.8</span>
+                      <span className="flex items-center gap-1"><Users className="h-3.5 w-3.5" /> 1,200</span>
+                      <span className="flex items-center gap-1"><Clock className="h-3.5 w-3.5" /> 12h</span>
+                    </div>
+                    <div className="mt-4 flex items-center text-sm font-medium text-primary opacity-0 group-hover:opacity-100 transition-all duration-300">
+                      Start learning <ArrowRight className="ml-1 h-3.5 w-3.5" />
+                    </div>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         )}
       </section>
