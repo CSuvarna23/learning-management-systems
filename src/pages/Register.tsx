@@ -56,7 +56,7 @@ export default function Register() {
               <div className="h-8 w-8 rounded-lg gradient-hero flex items-center justify-center">
                 <BookOpen className="h-4 w-4 text-primary-foreground" />
               </div>
-              <span className="font-display text-foreground">LearnHub</span>
+              <span className="font-display text-foreground">LearnFromScratch</span>
             </Link>
             <h2 className="text-2xl font-display text-foreground">Create an account</h2>
             <p className="text-muted-foreground mt-1">Get started for free</p>

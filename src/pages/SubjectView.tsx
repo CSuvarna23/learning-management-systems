@@ -216,7 +216,7 @@ export default function SubjectView() {
             <div className="h-6 w-6 rounded-md gradient-hero flex items-center justify-center">
               <BookOpen className="h-3 w-3 text-primary-foreground" />
             </div>
-            <span className="font-display text-sm hidden sm:inline text-foreground">LearnHub</span>
+            <span className="font-display text-sm hidden sm:inline text-foreground">LearnFromScratch</span>
           </Link>
           <div className="ml-auto flex items-center gap-2">
             <span className="text-xs text-muted-foreground">{completedCount}/{totalVideos} completed</span>
