@@ -66,10 +66,6 @@ export default function Index() {
             </div>
             <span className="text-lg font-display text-foreground">LearnFromScratch</span>
           </Link>
-          <nav className="hidden md:flex items-center gap-6">
-            <Link to="/" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Home</Link>
-            <Link to="/" className="text-sm font-medium text-foreground border-b-2 border-primary pb-0.5">Courses</Link>
-          </nav>
           <div className="flex items-center gap-3">
             {user ? (
               <>
