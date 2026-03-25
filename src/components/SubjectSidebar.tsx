@@ -50,16 +50,21 @@ export function SubjectSidebar({
   };
 
   return (
-    <div className="h-screen flex flex-col bg-sidebar text-sidebar-foreground border-r border-sidebar-border">
+    <div className="h-screen flex flex-col gradient-sidebar text-sidebar-foreground border-r border-sidebar-border">
       {/* Header */}
-      <div className="p-4 border-b border-sidebar-border">
+      <div className="p-5 border-b border-sidebar-border">
         <h2 className="font-display text-sidebar-primary text-lg leading-tight">{subject.title}</h2>
-        <div className="mt-3">
-          <div className="flex items-center justify-between text-xs text-sidebar-muted mb-1">
-            <span>Progress</span>
-            <span>{progressPercent}%</span>
+        <div className="mt-4">
+          <div className="flex items-center justify-between text-xs mb-1.5">
+            <span className="text-sidebar-muted">Progress</span>
+            <span className="text-accent font-medium">{progressPercent}%</span>
           </div>
-          <Progress value={progressPercent} className="h-1.5 bg-sidebar-accent" />
+          <div className="h-2 rounded-full bg-sidebar-accent overflow-hidden">
+            <div
+              className="h-full rounded-full bg-gradient-to-r from-accent to-sky transition-all duration-500"
+              style={{ width: `${progressPercent}%` }}
+            />
+          </div>
         </div>
       </div>
 
@@ -69,14 +74,14 @@ export function SubjectSidebar({
           <div key={section.id}>
             <button
               onClick={() => toggleSection(section.id)}
-              className="w-full flex items-center justify-between px-4 py-2.5 text-xs font-medium uppercase tracking-wider text-sidebar-muted hover:text-sidebar-foreground transition-colors"
+              className="w-full flex items-center justify-between px-5 py-3 text-xs font-semibold uppercase tracking-wider text-sidebar-muted hover:text-sidebar-foreground transition-colors"
             >
               <span>{section.title}</span>
-              <ChevronDown className={`h-3 w-3 transition-transform ${expandedSections.has(section.id) ? "" : "-rotate-90"}`} />
+              <ChevronDown className={`h-3 w-3 transition-transform duration-200 ${expandedSections.has(section.id) ? "" : "-rotate-90"}`} />
             </button>
 
             {expandedSections.has(section.id) && (
-              <div className="pb-2">
+              <div className="pb-2 space-y-0.5">
                 {section.videos.map(video => {
                   const locked = isVideoLocked(video.id);
                   const completed = progress[video.id]?.is_completed;
@@ -87,12 +92,12 @@ export function SubjectSidebar({
                       key={video.id}
                       onClick={() => onVideoSelect(video.id)}
                       disabled={locked}
-                      className={`w-full flex items-center gap-3 px-4 py-2 text-sm text-left transition-colors ${
+                      className={`w-full flex items-center gap-3 px-5 py-2.5 text-sm text-left transition-all duration-200 ${
                         isCurrent
-                          ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                          ? "bg-sidebar-accent text-sidebar-accent-foreground border-l-2 border-accent"
                           : locked
-                          ? "text-sidebar-muted cursor-not-allowed opacity-50"
-                          : "text-sidebar-foreground hover:bg-sidebar-accent/50"
+                          ? "text-sidebar-muted cursor-not-allowed opacity-40"
+                          : "text-sidebar-foreground hover:bg-sidebar-accent/50 hover:pl-6"
                       }`}
                     >
                       {completed ? (
@@ -100,7 +105,7 @@ export function SubjectSidebar({
                       ) : locked ? (
                         <Lock className="h-4 w-4 flex-shrink-0" />
                       ) : (
-                        <PlayCircle className={`h-4 w-4 flex-shrink-0 ${isCurrent ? "text-accent" : ""}`} />
+                        <PlayCircle className={`h-4 w-4 flex-shrink-0 ${isCurrent ? "text-accent" : "text-sidebar-muted"}`} />
                       )}
                       <span className="truncate">{video.title}</span>
                     </button>
