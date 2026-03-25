@@ -207,18 +207,23 @@ export default function SubjectView() {
       {/* Main content */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Top bar */}
-        <header className="h-14 border-b bg-card flex items-center px-4 gap-3 flex-shrink-0">
+        <header className="h-14 border-b bg-card/80 backdrop-blur-sm flex items-center px-4 gap-3 flex-shrink-0">
           <Button variant="ghost" size="icon" onClick={() => setSidebarOpen(!sidebarOpen)}>
             {sidebarOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
           </Button>
-          <Link to="/" className="flex items-center gap-2 text-primary">
-            <ArrowLeft className="h-4 w-4" />
-            <BookOpen className="h-5 w-5" />
-            <span className="font-display text-sm hidden sm:inline">LearnHub</span>
+          <Link to="/" className="flex items-center gap-2">
+            <ArrowLeft className="h-4 w-4 text-muted-foreground" />
+            <div className="h-6 w-6 rounded-md gradient-hero flex items-center justify-center">
+              <BookOpen className="h-3 w-3 text-primary-foreground" />
+            </div>
+            <span className="font-display text-sm hidden sm:inline text-foreground">LearnHub</span>
           </Link>
-          <span className="text-sm text-muted-foreground ml-auto">
-            {completedCount}/{totalVideos} completed
-          </span>
+          <div className="ml-auto flex items-center gap-2">
+            <span className="text-xs text-muted-foreground">{completedCount}/{totalVideos} completed</span>
+            <div className="w-20 h-1.5 rounded-full bg-muted overflow-hidden">
+              <div className="h-full rounded-full bg-gradient-to-r from-accent to-sky transition-all" style={{ width: `${progressPercent}%` }} />
+            </div>
+          </div>
         </header>
 
         {/* Video area */}
